@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+script_name="$(basename "${0}")"
+script_dir="$(realpath "$(dirname "${0}")")"
+script_usage="${script_name} HTTP_URL"
+
+usage() {
+  echo "${script_name}: usage: ${script_usage}" >&2
+}
+
+exit_with_error() {
+  echo "${script_name}: error: ${1}" >&2
+  usage
+  exit 1
+}
+
+recieved_arguments="${#}"
+expected_arguments="1"
+
+if [ "${recieved_arguments}" != "${expected_arguments}" ]; then
+  exit_with_error "invalid number of arguments, expected \"${expected_arguments}\", recieved \"${recieved_arguments}\""
+fi
+
+validate_regex="${script_dir}/validate-regex"
+regex_url="^https?://[^ ]+$"
+url="${1}"
+
+if ! "${validate_regex}" "${regex_url}" "${url}"; then
+  exit_with_error "not a valid url '${url}'"
+fi

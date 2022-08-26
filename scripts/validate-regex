@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+script_name="$(basename "${0}")"
+script_usage="${script_name} REGEX VALUE"
+
+usage() {
+  echo "${script_name}: usage: ${script_usage}" >&2
+}
+
+exit_with_error() {
+  echo "${script_name}: error: ${1}" >&2
+  usage
+  exit 1
+}
+
+recieved_arguments="${#}"
+expected_arguments="2"
+
+if [ "${recieved_arguments}" != "${expected_arguments}" ]; then
+  exit_with_error "invalid number of arguments, expected \"${expected_arguments}\", recieved \"${recieved_arguments}\""
+fi
+
+regex="${1}"
+value="${2}"
+
+if [[ ! "${value}" =~ ${regex} ]]; then
+  exit_with_error "value '${value}' failed to match pattern '${regex}'"
+fi
+
+exit 0

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+script_name="$(basename "${0}")"
+script_dir="$(realpath "$(dirname "${0}")")"
+script_usage="${script_name}"
+
+usage() {
+  echo "${script_name}: usage: ${script_usage}" >&2
+}
+
+exit_with_error() {
+  echo "${script_name}: error: ${1}" >&2
+  usage
+  exit 1
+}
+
+recieved_arguments="${#}"
+expected_arguments="0"
+
+if [ "${recieved_arguments}" != "${expected_arguments}" ]; then
+  exit_with_error "invalid number of arguments, expected \"${expected_arguments}\", recieved \"${recieved_arguments}\""
+fi
+
+docker_compose_dir="$(realpath "${script_dir}/..")"
+docker_compose_filepath="${docker_compose_dir}/docker-compose.yml"
+
+if ! docker-compose -f "${docker_compose_filepath}" exec nginx nginx -t; then
+  exit_with_error "failed to test nginx config"
+fi
